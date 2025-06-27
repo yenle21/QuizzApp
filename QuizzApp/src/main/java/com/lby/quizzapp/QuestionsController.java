@@ -5,6 +5,7 @@
 package com.lby.quizzapp;
 
 import com.lby.pojo.Category;
+import com.lby.services.CategoryService;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,32 +26,21 @@ import javafx.scene.control.ComboBox;
  * @author admin
  */
 public class QuestionsController implements Initializable {
-    @FXML private ComboBox<Category> cbCates;
+
+    @FXML
+    private ComboBox<Category> cbCates;
+    private final static CategoryService cateService = new CategoryService();
+
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            // TODO
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/quizzdb", "root", "root");
-            Statement stm = conn.createStatement();
-            ResultSet  rs = stm.executeQuery("SELECT * FROM Category");
-            List<Category> cates = new ArrayList<>();
-            while(rs.next())
-            {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                Category cate = new Category(id, name);
-                cates.add(cate);
-                System.out.println("Đã load " + cates.size() + " categories");
-            }
-            conn.close();
-            this.cbCates.setItems(FXCollections.observableList(cates));
-        } catch (ClassNotFoundException | SQLException ex) {
+            this.cbCates.setItems(FXCollections.observableList(cateService.getCates()));
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
-    }    
-    
+    }
+
 }

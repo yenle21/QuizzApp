@@ -1,5 +1,6 @@
 package com.lby.quizzapp;
 
+import com.lby.utils.JdbcConnector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,6 +22,12 @@ public class App extends Application {
         stage.setScene(scene);
         stage.show();
         stage.setTitle("QUIZZAPP");
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+        JdbcConnector.getInstance().close();
     }
 
     static void setRoot(String fxml) throws IOException {
