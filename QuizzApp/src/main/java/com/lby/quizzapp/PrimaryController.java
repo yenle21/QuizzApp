@@ -1,23 +1,41 @@
 package com.lby.quizzapp;
 
 import com.lby.utils.MyAlert;
+import com.lby.utils.myStage;
+import com.lby.utils.theme.DefaultThemeFactory;
+import com.lby.utils.theme.Theme;
+import com.lby.utils.theme.ThemeManager;
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 
+public class PrimaryController implements Initializable {
 
+    @FXML
+    private ComboBox<Theme> cbTheme;
 
-public class PrimaryController {
-    public void handleMyQuestion(ActionEvent event) throws IOException{
-        Scene scene = new Scene( new FXMLLoader(App.class.getResource( "Questions.fxml")).load());
-        Stage stage =  new Stage();
-        stage.setScene(scene);
-        stage.show();
+    public void changeTheme(ActionEvent event) {
+        this.cbTheme.getSelectionModel().getSelectedItem().updateTheme(this.cbTheme.getScene());
     }
-    public void handlePractice(ActionEvent event){
-         MyAlert.getInstance().showAlert("Coming Soon...");
+    
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        this.cbTheme.setItems(FXCollections.observableArrayList(Theme.values()));
+        
+    }
+    
+    public void handleMyQuestion(ActionEvent event) throws IOException {
+        myStage.getInstance().showStage("Questions.fxml");
+        
+    }
+
+    public void handlePractice(ActionEvent event) {
+        MyAlert.getInstance().showAlert("Coming Soon...");
     }
     
 }

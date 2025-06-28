@@ -9,18 +9,17 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="451.0" prefWidth="464.0" styleClass="Main" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lby.quizzapp.QuestionsController">
    <children>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Subject" text="Quản Lý Câu Hỏi" />
-      <TextArea prefHeight="53.0" prefWidth="444.0" promptText="Nội dung câu hỏi ..." />
+      <TextArea fx:id="txtContent" prefHeight="53.0" prefWidth="444.0" promptText="Nội dung câu hỏi ..." />
       <HBox prefHeight="41.0" prefWidth="444.0" styleClass="Main">
          <children>
             <ComboBox fx:id="cbCates" prefWidth="150.0" promptText="Danh Mục" />
-            <ComboBox prefWidth="150.0" promptText="Mức độ " />
+            <ComboBox fx:id="cbLevels" prefWidth="150.0" promptText="Level" />
          </children>
       </HBox>
-      <VBox prefHeight="103.0" prefWidth="444.0" styleClass="Main">
+      <VBox fx:id="vboxChoice" prefHeight="103.0" prefWidth="444.0" styleClass="Main">
          <children>
             <HBox prefHeight="45.0" prefWidth="424.0" styleClass="Main">
                <children>
@@ -36,6 +35,7 @@
             </HBox>
          </children>
       </VBox>
-      <Button mnemonicParsing="false" styleClass="Button" text="Thêm Câu Hỏi" />
+      <Button mnemonicParsing="false" onAction="#addChoice" styleClass="Button" text="Add Choice" />
+      <Button mnemonicParsing="false" onAction="#addChoice" style="-fx-background-color: red;" styleClass="Button" text="Add Question" textFill="#dd1e1e" />
    </children>
 </VBox>
