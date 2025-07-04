@@ -5,10 +5,13 @@
 package com.lby.quizzapp;
 
 import com.lby.pojo.Category;
+import com.lby.pojo.Choice;
 import com.lby.pojo.Level;
 import com.lby.pojo.Question;
 import com.lby.services.CategoryService;
 import com.lby.services.LevelService;
+import com.lby.services.QuestionServices;
+import com.lby.utils.MyAlert;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,6 +29,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -36,13 +40,20 @@ import javafx.scene.layout.VBox;
  */
 public class QuestionsController implements Initializable {
 
-    @FXML private ComboBox<Category> cbCates;
-    @FXML private ComboBox<Level> cbLevels;
-    
-    @FXML private VBox vboxChoice;
-    @FXML private TextArea txtContent;
+    @FXML
+    private ComboBox<Category> cbCates;
+    @FXML
+    private ComboBox<Level> cbLevels;
+    @FXML
+    private VBox vboxChoice;
+    @FXML
+    private TextArea txtContent;
+    @FXML
+    private ToggleGroup toggleChoice;
+
     private final static CategoryService cateService = new CategoryService();
-      private final static LevelService levelService = new LevelService();
+    private final static LevelService levelService = new LevelService();
+    private static final QuestionServices questionServices = new QuestionServices();
 
     /**
      * Initializes the controller class.
@@ -56,20 +67,44 @@ public class QuestionsController implements Initializable {
             ex.printStackTrace();
         }
     }
-    public void addChoice(ActionEvent event){
-        HBox h = new HBox();
+
+    public void addChoice(ActionEvent event) {
+         HBox h = new HBox();
         h.getStyleClass().add("Main");
-        RadioButton rd = new RadioButton();
+        
+        RadioButton r = new RadioButton();
+        r.setToggleGroup(toggleChoice);
+        
         TextField txt = new TextField();
-        h.getChildren().addAll(rd,txt);
+        txt.getStyleClass().add("Input");
+        
+        h.getChildren().addAll(r, txt);
+        
         this.vboxChoice.getChildren().add(h);
     }
-    public void addQuestion (ActionEvent event)
-    {
-        Question.Builder b = new Question.Builder(this.txtContent.getText(),
-                this.cbCates.getSelectionModel().getSelectedItem(), 
-                 this.cbLevels.getSelectionModel().getSelectedItem()
-        );
+
+    public void addQuestion(ActionEvent event) {
+        try {
+            Question.Builder b = new Question.Builder(this.txtContent.getText(),
+                    this.cbCates.getSelectionModel().getSelectedItem(),
+                    this.cbLevels.getSelectionModel().getSelectedItem());
+
+            for (var c : vboxChoice.getChildren()) {
+                HBox h = (HBox) c;
+                Choice choice = new Choice(((TextField) h.getChildren().get(1)).getText(),
+                        ((RadioButton) h.getChildren().get(0)).isSelected());
+                b.addChoice(choice);
+            }
+
+            questionServices.addQuestion(b.build());
+
+            MyAlert.getInstance().showMsg("Thêm câu hỏi thành công!");
+        } catch (SQLException ex) {
+            MyAlert.getInstance().showMsg("Thêm câu hỏi thất bại, lý do: " + ex.getMessage());
+        } catch (Exception ex) {
+            MyAlert.getInstance().showMsg("Dữ liệu có lỗi!");
+
+        }
     }
 
 }

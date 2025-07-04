@@ -4,6 +4,10 @@
  */
 package com.lby.pojo;
 
+import com.lby.pojo.Category;
+import com.lby.pojo.Choice;
+import com.lby.pojo.Level;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,6 +15,7 @@ import java.util.List;
  * @author admin
  */
 public class Question {
+
     private int id;
     private String content;
     private String hint;
@@ -18,49 +23,53 @@ public class Question {
     private Category category;
     private Level level;
     private List<Choice> choices;
-    
-    public Question(Builder builder){
+
+    private Question(Builder builder) {
         this.id = builder.id;
         this.content = builder.content;
         this.hint = builder.hint;
         this.image = builder.image;
-        this.category=builder.category;
+        this.category = builder.category;
         this.level = builder.level;
         this.choices = builder.choices;
     }
-    public static class Builder{
 
+    public static class Builder {
         private int id;
         private String content;
         private String hint;
         private String image;
         private Category category;
         private Level level;
-        private List<Choice> choices;
+        private List<Choice> choices = new ArrayList<>();
         
-        public Builder(String content,Category category, Level level){
+        public Builder(String content, Category category, Level level) throws Exception {
+            if (content.isEmpty() || category == null || level == null)
+                throw new Exception("Invalid data");
+            
             this.content = content;
-            this.category=category;
+            this.category = category;
             this.level = level;
         }
-        public Builder setHint(String hint)
-        {
-            this.hint = hint ;
-            return this;
-        }
-          public Builder setImage(String img)
-        {
-            this.image = img ;
-            return this;
-        }
-          public Builder addChoice(Choice c){
-              this.choices.add(c);
-              return this;
-          }
-          public Question build(){
-              return new Question(this); 
-          }
         
+        public Builder setHint(String h) {
+            this.hint = h;
+            return this;
+        }
+        
+        public Builder setImage(String im) {
+            this.image = im;
+            return this;
+        }
+        
+        public Builder addChoice(Choice c) {
+            this.choices.add(c);
+            return this;
+        }
+        
+        public Question build() {
+            return new Question(this);
+        }
     }
 
     /**
@@ -160,5 +169,4 @@ public class Question {
     public void setChoices(List<Choice> choices) {
         this.choices = choices;
     }
-    
 }
