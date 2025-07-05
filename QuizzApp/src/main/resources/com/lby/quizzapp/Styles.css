@@ -28,3 +28,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to ed
     -fx-font-weight: bold;
     
 }
+.Correct{
+    -fx-fill:blue;
+}
+.Wrong{
+    -fx-fill:red;
+}

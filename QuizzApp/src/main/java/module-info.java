@@ -8,4 +8,5 @@ module com.lby.quizzapp {
 
     opens com.lby.quizzapp to javafx.fxml;
     exports com.lby.quizzapp;
+    exports com.lby.pojo;
 }

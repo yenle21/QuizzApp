@@ -20,16 +20,25 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -50,6 +59,10 @@ public class QuestionsController implements Initializable {
     private TextArea txtContent;
     @FXML
     private ToggleGroup toggleChoice;
+    @FXML
+    private TableView<Question> tbquestions;
+    @FXML
+    private TextField txtSearch;
 
     private final static CategoryService cateService = new CategoryService();
     private final static LevelService levelService = new LevelService();
@@ -63,23 +76,33 @@ public class QuestionsController implements Initializable {
         try {
             this.cbCates.setItems(FXCollections.observableList(cateService.getCates()));
             this.cbLevels.setItems(FXCollections.observableList(levelService.getLevels()));
+            this.loadColumn();
+            this.loadQuestion(questionServices.getQuestions());
+            this.tbquestions.setItems(FXCollections.observableList(questionServices.getQuestions()));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        this.txtSearch.textProperty().addListener((e)->{
+            try {
+                this.loadQuestion(questionServices.getQuestions(this.txtSearch.getText()));
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionsController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            } 
+        });
     }
 
     public void addChoice(ActionEvent event) {
-         HBox h = new HBox();
+        HBox h = new HBox();
         h.getStyleClass().add("Main");
-        
+
         RadioButton r = new RadioButton();
         r.setToggleGroup(toggleChoice);
-        
+
         TextField txt = new TextField();
         txt.getStyleClass().add("Input");
-        
+
         h.getChildren().addAll(r, txt);
-        
+
         this.vboxChoice.getChildren().add(h);
     }
 
@@ -106,5 +129,44 @@ public class QuestionsController implements Initializable {
 
         }
     }
+    private void loadQuestion(List<Question> questions){
+        this.tbquestions.setItems(FXCollections.observableList(questions));
+
+    }
+
+    private void loadColumn() {
+        TableColumn colId = new TableColumn("Id");
+        colId.setCellValueFactory(new PropertyValueFactory("id"));
+        colId.setPrefWidth(80);
+
+        TableColumn colContent = new TableColumn("QUESTIONS");
+        colContent.setCellValueFactory(new PropertyValueFactory("content"));
+        colContent.setPrefWidth(250);
+        
+        TableColumn colAction = new TableColumn();
+        colAction.setCellFactory(e->{
+            TableCell cell = new TableCell();
+            Button btn = new Button("Delete");
+            btn.setOnAction(event->{
+                Optional<ButtonType> t = MyAlert.getInstance().showMsg("If u delete question then all choice also delete. Are u sure???", Alert.AlertType.CONFIRMATION);
+                if(t.isPresent() && t.get().equals(ButtonType.OK)){
+             
+                    Question q = (Question)cell.getTableRow().getItem();
+                    try {
+                        if(questionServices.deleteQuestions(q.getId())==true){
+                            MyAlert.getInstance().showMsg("Delete Done");
+                            this.tbquestions.getItems().remove(q);
+                        }
+                    } catch (SQLException ex) {
+                        Logger.getLogger(QuestionsController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            cell.setGraphic(btn);
+            return cell;
+        });
+        this.tbquestions.getColumns().addAll(colId, colContent,colAction);
+    }
+    
 
 }
