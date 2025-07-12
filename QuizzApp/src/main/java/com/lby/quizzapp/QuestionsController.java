@@ -9,8 +9,15 @@ import com.lby.pojo.Choice;
 import com.lby.pojo.Level;
 import com.lby.pojo.Question;
 import com.lby.services.CategoryService;
+import com.lby.services.FlyweightFactory;
 import com.lby.services.LevelService;
-import com.lby.services.QuestionServices;
+import com.lby.services.questions.BaseQuestionServices;
+import com.lby.services.questions.CategoryQuestionsDecorator;
+import com.lby.services.questions.KeyWordQuestionDecorator;
+import com.lby.services.questions.LevelsQuestionDecorator;
+import com.lby.services.questions.QuestionServices;
+import com.lby.services.questions.UpdateQuestionServices;
+import com.lby.utils.Configs;
 import com.lby.utils.MyAlert;
 import java.net.URL;
 import java.sql.Connection;
@@ -63,10 +70,10 @@ public class QuestionsController implements Initializable {
     private TableView<Question> tbquestions;
     @FXML
     private TextField txtSearch;
-
-    private final static CategoryService cateService = new CategoryService();
-    private final static LevelService levelService = new LevelService();
-    private static final QuestionServices questionServices = new QuestionServices();
+    @FXML
+    private ComboBox<Category> cbSearchCate;
+    @FXML
+    private ComboBox<Level> cbSearchLevels;
 
     /**
      * Initializes the controller class.
@@ -74,21 +81,40 @@ public class QuestionsController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
-            this.cbCates.setItems(FXCollections.observableList(cateService.getCates()));
-            this.cbLevels.setItems(FXCollections.observableList(levelService.getLevels()));
+            this.cbCates.setItems(FXCollections.observableList(FlyweightFactory.getData(Configs.cateService, "category")));
+            this.cbSearchCate.setItems(FXCollections.observableList(FlyweightFactory.getData(Configs.cateService, "category")));
+            this.cbSearchLevels.setItems(FXCollections.observableList(FlyweightFactory.getData(Configs.levelService, "level")));
+            this.cbLevels.setItems(FXCollections.observableList(FlyweightFactory.getData(Configs.levelService, "level")));
             this.loadColumn();
-            this.loadQuestion(questionServices.getQuestions());
-            this.tbquestions.setItems(FXCollections.observableList(questionServices.getQuestions()));
+            this.loadQuestion(Configs.questionServices.list());
+            //   this.tbquestions.setItems(FXCollections.observableList(questionServices.getQuestions()));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        this.txtSearch.textProperty().addListener((e)->{
+        this.txtSearch.textProperty().addListener((e) -> {
             try {
-                this.loadQuestion(questionServices.getQuestions(this.txtSearch.getText()));
+                BaseQuestionServices s = new KeyWordQuestionDecorator(Configs.questionServices, this.txtSearch.getText());
+                this.loadQuestion(s.list());
             } catch (SQLException ex) {
                 Logger.getLogger(QuestionsController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            } 
+            }
         });
+        this.cbSearchCate.getSelectionModel().selectedItemProperty().addListener((e) -> {
+            try {
+                BaseQuestionServices s = new CategoryQuestionsDecorator(Configs.questionServices,  this.cbSearchCate.getSelectionModel().getSelectedItem());
+                this.loadQuestion(s.list());
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionsController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+        });
+        this.cbSearchLevels.getSelectionModel().selectedItemProperty().addListener((e->{
+             try {
+                BaseQuestionServices s = new LevelsQuestionDecorator(Configs.questionServices,  this.cbSearchLevels.getSelectionModel().getSelectedItem());
+                this.loadQuestion(s.list());
+            } catch (SQLException ex) {
+                Logger.getLogger(QuestionsController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
+        }));
     }
 
     public void addChoice(ActionEvent event) {
@@ -119,7 +145,7 @@ public class QuestionsController implements Initializable {
                 b.addChoice(choice);
             }
 
-            questionServices.addQuestion(b.build());
+            Configs.upServices.addQuestion(b.build());
 
             MyAlert.getInstance().showMsg("Thêm câu hỏi thành công!");
         } catch (SQLException ex) {
@@ -129,7 +155,8 @@ public class QuestionsController implements Initializable {
 
         }
     }
-    private void loadQuestion(List<Question> questions){
+
+    private void loadQuestion(List<Question> questions) {
         this.tbquestions.setItems(FXCollections.observableList(questions));
 
     }
@@ -142,18 +169,18 @@ public class QuestionsController implements Initializable {
         TableColumn colContent = new TableColumn("QUESTIONS");
         colContent.setCellValueFactory(new PropertyValueFactory("content"));
         colContent.setPrefWidth(250);
-        
+
         TableColumn colAction = new TableColumn();
-        colAction.setCellFactory(e->{
+        colAction.setCellFactory(e -> {
             TableCell cell = new TableCell();
             Button btn = new Button("Delete");
-            btn.setOnAction(event->{
+            btn.setOnAction(event -> {
                 Optional<ButtonType> t = MyAlert.getInstance().showMsg("If u delete question then all choice also delete. Are u sure???", Alert.AlertType.CONFIRMATION);
-                if(t.isPresent() && t.get().equals(ButtonType.OK)){
-             
-                    Question q = (Question)cell.getTableRow().getItem();
+                if (t.isPresent() && t.get().equals(ButtonType.OK)) {
+
+                    Question q = (Question) cell.getTableRow().getItem();
                     try {
-                        if(questionServices.deleteQuestions(q.getId())==true){
+                        if (Configs.upServices.deleteQuestions(q.getId()) == true) {
                             MyAlert.getInstance().showMsg("Delete Done");
                             this.tbquestions.getItems().remove(q);
                         }
@@ -165,8 +192,7 @@ public class QuestionsController implements Initializable {
             cell.setGraphic(btn);
             return cell;
         });
-        this.tbquestions.getColumns().addAll(colId, colContent,colAction);
+        this.tbquestions.getColumns().addAll(colId, colContent, colAction);
     }
-    
 
 }

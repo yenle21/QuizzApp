@@ -4,27 +4,31 @@
  */
 package com.lby.services;
 
-
 import com.lby.pojo.Level;
 import com.lby.utils.JdbcConnector;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  *
  * @author admin
  */
-public class LevelService {
+public class LevelService extends BaseServices<Level> {
 
-    public List<Level> getLevels() throws SQLException {
-        Connection conn = JdbcConnector.getInstance().connect();
-        Statement stm = conn.createStatement();
-        ResultSet rs = stm.executeQuery("SELECT * FROM level");
+
+    @Override
+    public PreparedStatement getStatement(Connection conn) throws SQLException {
+        return conn.prepareCall("SELECT * FROM Level");
+    }
+
+    @Override
+    public List<Level> getResult(ResultSet rs) throws SQLException {
+        
         List<Level> levels = new ArrayList<>();
         while (rs.next()) {
             int id = rs.getInt("id");
@@ -35,6 +39,5 @@ public class LevelService {
         }
         return levels;
     }
-
 
 }
