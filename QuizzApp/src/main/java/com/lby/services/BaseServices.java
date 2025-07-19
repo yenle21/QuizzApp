@@ -24,8 +24,5 @@ public abstract class BaseServices<T> {
         Connection conn = JdbcConnector.getInstance().connect();
         PreparedStatement stm = this.getStatement(conn);
         return this.getResult(stm.executeQuery());
-       
     }
-    
-    
 }

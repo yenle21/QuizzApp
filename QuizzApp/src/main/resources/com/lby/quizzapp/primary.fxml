@@ -5,12 +5,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="348.0" styleClass="Main" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lby.quizzapp.PrimaryController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="455.0" prefWidth="348.0" styleClass="Main" stylesheets="@Styles.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.lby.quizzapp.PrimaryController">
    <children>
       <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="Subject" text="Quizz App" />
       <Button mnemonicParsing="false" onAction="#handleMyQuestion" styleClass="Button" text="Question" />
       <Button layoutX="149.0" layoutY="249.0" mnemonicParsing="false" onAction="#handlePractice" styleClass="Button" text="Practice" />
-      <Button layoutX="109.0" layoutY="251.0" mnemonicParsing="false" onAction="#handlePractice" styleClass="Button" text="Test" />
+      <Button layoutX="109.0" layoutY="251.0" mnemonicParsing="false" onAction="#handleExam" styleClass="Button" text="Exam" />
       <Button layoutX="109.0" layoutY="271.0" mnemonicParsing="false" onAction="#handlePractice" styleClass="Button" text="Sign Up" />
       <Button layoutX="109.0" layoutY="292.0" mnemonicParsing="false" onAction="#handlePractice" styleClass="Button" text="Sign In" />
       <ComboBox fx:id="cbTheme" onAction="#changeTheme" prefWidth="150.0" styleClass="Button" />
